@@ -1,2 +1,2 @@
 # map-avl
-R6RSによるAVLの単純な実装
+R6RSによるAVL木の単純な実装
