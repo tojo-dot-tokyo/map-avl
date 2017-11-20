@@ -1,7 +1,7 @@
 #!r6rs
 (library (tokyo tojo map avl)
   (export map? empty? empty
-          insert search
+          add search
           (rename (avl:remove remove))
           size
           (rename (avl:map map)
@@ -18,7 +18,7 @@
                   (avl:fold-right/key fold-right/key))
           union union/key)
   (import (rnrs))
-
+  
   (define map?
     (lambda (x)
       (or (empty? x) (node? x))))
@@ -166,13 +166,13 @@
                                   (balance-factor tr)
                                   tr)]))))
 
-  (define insert
+  (define add
     (case-lambda
       [(<? =? tr k v)
-       (error-not-map-tree 'insert tr)
+       (error-not-map-tree 'add tr)
        (let f ([tr tr])
          (if (not (or (node? tr) (empty? tr)))
-             (assertion-violation 'insert "not map tree" tr))
+             (assertion-violation 'add "not map tree" tr))
          (if (empty? tr)
              (make-node (cons k v) empty empty 0)
              (let ([kv (key&value tr)])
@@ -194,7 +194,7 @@
                                        l r
                                        (height+ l r))))]))))]
       [(tr k v)
-       (insert < = tr k v)]))
+       (add < = tr k v)]))
 
   (define search
     (case-lambda
@@ -387,24 +387,24 @@
          (let loop ([l1 l1] [l2 l2] [acc empty])
            (cond [(null? l1)
                   (fold-left
-                   (lambda (acc p) (insert <? =? acc
+                   (lambda (acc p) (add <? =? acc
                                            (car p) (cdr p)))
                    acc l2)]
                  [(null? l2)
                   (fold-left (lambda (acc p)
-                               (insert <? =? acc
+                               (add <? =? acc
                                        (car p) (cdr p)))
                              acc l1)]
                  [(=? (caar l1) (caar l2))
                   (loop (cdr l1) (cdr l2)
-                        (insert <? =? acc
+                        (add <? =? acc
                                 (caar l1)
                                 (f (caar l1) (cdar l1) (cdar l2))))]
                  [(<? (caar l1) (caar l2))
                   (loop (cdr l1) l2
-                        (insert <? =? acc
+                        (add <? =? acc
                                 (caar l1) (cdar l1)))]
                  [else
                   (loop l1 (cdr l2)
-                        (insert <? =? acc
+                        (add <? =? acc
                                 (caar l2) (cdar l2)))])))])))
